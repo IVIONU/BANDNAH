@@ -1,0 +1,88 @@
+import pandas as pd
+
+# Path to the Excel file
+file_path = 'IdealWorldCup.xlsx'
+
+# Read the Excel file
+df = pd.read_excel(file_path)
+
+# Display the first few rows of the dataframe
+print(df.head())
+import pandas as pd
+import random
+
+# Path to the Excel file
+file_path = 'IdealWorldCup.xlsx'
+
+# Read the Excel file
+df = pd.read_excel(file_path)
+
+# Shuffle the songs
+songs = df.sample(frac=1).reset_index(drop=True)
+
+# Number of groups
+num_groups = 25
+group_size = len(songs) // num_groups
+
+# Create groups
+groups = [songs.iloc[i:i + group_size] for i in range(0, len(songs), group_size)]
+
+# Display the groups
+for i, group in enumerate(groups):
+    print(f"Group {i + 1}:")
+    print(group)
+    print()
+from flask import Flask, render_template, request
+import pandas as pd
+
+app = Flask(__name__)
+
+# Path to the Excel file
+file_path = 'IdealWorldCup.xlsx'
+
+# Read the Excel file
+df = pd.read_excel(file_path)
+
+# Shuffle the songs
+songs = df.sample(frac=1).reset_index(drop=True)
+
+# Number of groups
+num_groups = 25
+group_size = len(songs) // num_groups
+
+# Create groups
+groups = [songs.iloc[i:i + group_size] for i in range(0, len(songs), group_size)]
+
+@app.route('/')
+def index():
+    return render_template('index.html', groups=groups)
+
+@app.route('/vote', methods=['POST'])
+def vote():
+    votes = request.form.to_dict()
+    # Save votes to a file or database
+    return "Thank you for voting!"
+
+if __name__ == '__main__':
+    app.run(debug=True)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ideal World Cup Voting</title>
+</head>
+<body>
+    <h1>Vote for Your Favorite Songs</h1>
+    <form action="/vote" method="post">
+        {% for group in groups %}
+        <h2>Group {{ loop.index }}</h2>
+        {% for index, row in group.iterrows() %}
+        <input type="radio" name="group{{ loop.index }}" value="{{ row['Song ID'] }}">
+        {{ row['Song Name'] }} by {{ row['Artist'] }}<br>
+        {% endfor %}
+        {% endfor %}
+        <input type="submit" value="Submit Votes">
+    </form>
+</body>
+</html>
